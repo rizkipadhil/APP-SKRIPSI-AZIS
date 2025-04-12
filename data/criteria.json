@@ -1,0 +1,29 @@
+{
+  "criteria": [
+    {
+      "name": "Nilai Rata-Rata Rapot",
+      "type": "benefit",
+      "weight": 0.35
+    },
+    {
+      "name": "Penghasilan Orang Tua",
+      "type": "cost",
+      "weight": 0.30
+    },
+    {
+      "name": "Jumlah Saudara",
+      "type": "benefit",
+      "weight": 0.15
+    },
+    {
+      "name": "Anak ke",
+      "type": "cost",
+      "weight": 0.10
+    },
+    {
+      "name": "Prestasi Non Akademik",
+      "type": "benefit",
+      "weight": 0.10
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Beasiswa SAW</title>
+  <!-- Vue 3 -->
+  <script src="https://unpkg.com/vue@3"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50">
+  <div id="app">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-8">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-3xl font-bold">Aplikasi Beasiswa SAW</h1>
+            <p class="mt-2 text-indigo-100">Seleksi Penerima Beasiswa dengan Metode Simple Additive Weighting</p>
+          </div>
+          <a href="/admin.html" class="bg-white text-indigo-600 px-4 py-2 rounded-md hover:bg-indigo-100 transition-colors flex items-center">
+            <i class="fas fa-user-shield mr-2"></i> Admin Panel
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Pengumuman Beasiswa -->
+    <section class="py-12 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800">Pengumuman Beasiswa</h2>
+          <div class="w-20 h-1 bg-indigo-600 mx-auto my-4"></div>
+          <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+            Berikut adalah hasil seleksi penerima beasiswa berdasarkan metode SAW (Simple Additive Weighting)
+          </p>
+        </div>
+
+        <!-- Informasi Kuota -->
+        <div class="bg-indigo-100 p-6 rounded-xl mb-12 shadow-sm max-w-3xl mx-auto">
+          <div class="flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center mb-4 md:mb-0">
+              <div class="bg-indigo-600 p-3 rounded-lg text-white mr-4">
+                <i class="fas fa-award text-2xl"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-800">Kuota Beasiswa</h3>
+                <p class="text-gray-600">Tersedia untuk {{ pengaturan.kuota_beasiswa }} siswa terbaik</p>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="bg-green-600 p-3 rounded-lg text-white mr-4">
+                <i class="fas fa-users text-2xl"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-800">Total Pendaftar</h3>
+                <p class="text-gray-600">{{ hasilSeleksi.jumlah_pendaftar }} siswa telah mendaftar</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6">
+            <div class="bg-white p-4 rounded-lg border border-indigo-200">
+              <p class="text-gray-700"><i class="fas fa-info-circle text-indigo-600 mr-2"></i> {{ pengaturan.peringatan }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hasil Seleksi -->
+        <div class="mb-8 overflow-hidden rounded-xl shadow-md">
+          <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+              <thead>
+                <tr class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                  <th class="py-4 px-6 text-left">Peringkat</th>
+                  <th class="py-4 px-6 text-left">Nama</th>
+                  <th class="py-4 px-6 text-center">Nilai Rapot</th>
+                  <th class="py-4 px-6 text-center">Penghasilan (juta)</th>
+                  <th class="py-4 px-6 text-center">Jumlah Saudara</th>
+                  <th class="py-4 px-6 text-center">Anak ke</th>
+                  <th class="py-4 px-6 text-center">Prestasi</th>
+                  <th class="py-4 px-6 text-center">Nilai SAW</th>
+                  <th class="py-4 px-6 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr v-for="siswa in hasilSeleksi.hasil" :key="siswa.nama" 
+                    :class="{'bg-green-50': siswa.lolos}">
+                  <td class="py-4 px-6 font-bold">{{ siswa.peringkat }}</td>
+                  <td class="py-4 px-6 font-medium">{{ siswa.nama }}</td>
+                  <td class="py-4 px-6 text-center">{{ siswa.nilai }}</td>
+                  <td class="py-4 px-6 text-center">{{ siswa.penghasilan }}</td>
+                  <td class="py-4 px-6 text-center">{{ siswa.jumlah_saudara }}</td>
+                  <td class="py-4 px-6 text-center">{{ siswa.anak_ke }}</td>
+                  <td class="py-4 px-6 text-center">{{ siswa.prestasi }}</td>
+                  <td class="py-4 px-6 text-center font-medium">{{ siswa.nilai_saw }}</td>
+                  <td class="py-4 px-6 text-center">
+                    <span v-if="siswa.lolos" class="bg-green-100 text-green-800 text-xs font-medium px-3 py-1 rounded-full">
+                      <i class="fas fa-check-circle mr-1"></i>Lolos
+                    </span>
+                    <span v-else class="bg-gray-100 text-gray-800 text-xs font-medium px-3 py-1 rounded-full">
+                      <i class="fas fa-times-circle mr-1"></i>Tidak Lolos
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kriteria dan Bobot -->
+    <section class="py-12 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-10">
+          <h2 class="text-2xl font-bold text-gray-800">Kriteria dan Bobot Penilaian</h2>
+          <div class="w-16 h-1 bg-indigo-600 mx-auto my-4"></div>
+          <p class="text-gray-600 max-w-2xl mx-auto">
+            Berikut adalah kriteria dan bobot yang digunakan dalam perhitungan seleksi beasiswa menggunakan metode SAW
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div v-for="item in criteria" :key="item.name" 
+               class="bg-white p-6 rounded-xl shadow-sm border-l-4"
+               :class="[item.type === 'benefit' ? 'border-green-400' : 'border-red-400']">
+            <div class="flex items-start mb-4">
+              <div :class="[
+                'p-3 rounded-lg mr-4 text-white',
+                item.type === 'benefit' ? 'bg-green-500' : 'bg-red-500'
+              ]">
+                <i :class="[
+                  'text-xl',
+                  item.type === 'benefit' ? 'fas fa-plus-circle' : 'fas fa-minus-circle'
+                ]"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-gray-800">{{ item.name }}</h3>
+                <p class="text-sm text-gray-500">
+                  <span :class="[
+                    'font-medium',
+                    item.type === 'benefit' ? 'text-green-600' : 'text-red-600'
+                  ]">
+                    {{ item.type === 'benefit' ? 'Benefit' : 'Cost' }}
+                  </span>
+                  - Semakin {{ item.type === 'benefit' ? 'tinggi' : 'rendah' }} semakin baik
+                </p>
+              </div>
+            </div>
+            <div class="mt-2">
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">Bobot:</span>
+                <span class="text-lg font-bold text-indigo-600">{{ item.weight }}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div class="bg-indigo-600 h-2.5 rounded-full" :style="{width: `${item.weight * 100}%`}"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <h3 class="text-xl font-bold">Aplikasi Beasiswa SAW</h3>
+            <p class="text-gray-400 mt-1">Seleksi penerima beasiswa dengan metode Simple Additive Weighting</p>
+          </div>
+          <div class="flex space-x-4">
+            <a href="#" class="hover:text-indigo-400 transition-colors">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="hover:text-indigo-400 transition-colors">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="hover:text-indigo-400 transition-colors">
+              <i class="fab fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+        <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
+          <p>&copy; {{ new Date().getFullYear() }} - Aplikasi Beasiswa SAW</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const { createApp, ref, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        const criteria = ref([]);
+        const pengaturan = ref({
+          kuota_beasiswa: 0,
+          peringatan: ""
+        });
+        const hasilSeleksi = ref({
+          hasil: [],
+          jumlah_pendaftar: 0
+        });
+
+        const fetchCriteria = async () => {
+          try {
+            const response = await fetch('/api/criteria');
+            const data = await response.json();
+            criteria.value = data.criteria;
+          } catch (error) {
+            console.error('Error fetching criteria:', error);
+          }
+        };
+
+        const fetchSettings = async () => {
+          try {
+            const response = await fetch('/api/settings');
+            const data = await response.json();
+            pengaturan.value = data;
+          } catch (error) {
+            console.error('Error fetching settings:', error);
+          }
+        };
+
+        const fetchHasilSeleksi = async () => {
+          try {
+            const response = await fetch('/api/hasil');
+            const data = await response.json();
+            hasilSeleksi.value = data;
+          } catch (error) {
+            console.error('Error fetching hasil seleksi:', error);
+          }
+        };
+
+        onMounted(() => {
+          fetchCriteria();
+          fetchSettings();
+          fetchHasilSeleksi();
+        });
+
+        return {
+          criteria,
+          pengaturan,
+          hasilSeleksi
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+
+</html>

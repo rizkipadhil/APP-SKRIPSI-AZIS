@@ -1,0 +1,34 @@
+[
+  {
+    "nama": "Andi",
+    "nilai": 85,
+    "penghasilan": 3.2,
+    "jumlah_saudara": 2,
+    "anak_ke": 1,
+    "prestasi": 8
+  },
+  {
+    "nama": "Budi",
+    "nilai": 90,
+    "penghasilan": 4,
+    "jumlah_saudara": 3,
+    "anak_ke": 2,
+    "prestasi": 7
+  },
+  {
+    "nama": "Cici",
+    "nilai": 78,
+    "penghasilan": 2.5,
+    "jumlah_saudara": 4,
+    "anak_ke": 3,
+    "prestasi": 9
+  },
+  {
+    "nama": "kucing",
+    "nilai": 100,
+    "penghasilan": 3.2,
+    "jumlah_saudara": 3,
+    "anak_ke": 1,
+    "prestasi": 1
+  }
+]
