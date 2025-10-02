@@ -1,34 +1,92 @@
 [
   {
-    "nama": "Andi",
-    "nilai": 85,
-    "penghasilan": 3.2,
-    "jumlah_saudara": 2,
-    "anak_ke": 1,
-    "prestasi": 8
+    "nisn": "75168490",
+    "nama": "Fransiska Natali Cahayani Babut",
+    "c1": 88,
+    "c2": 2000000,
+    "c3": 5,
+    "c4": 4,
+    "c5": "Tingkat Kabupaten"
   },
   {
-    "nama": "Budi",
-    "nilai": 90,
-    "penghasilan": 4,
-    "jumlah_saudara": 3,
-    "anak_ke": 2,
-    "prestasi": 7
+    "nisn": "73932426",
+    "nama": "Tiani Lusitania Neno",
+    "c1": 87,
+    "c2": 2500000,
+    "c3": 4,
+    "c4": 3,
+    "c5": "Tingkat Kabupaten"
   },
   {
-    "nama": "Cici",
-    "nilai": 78,
-    "penghasilan": 2.5,
-    "jumlah_saudara": 4,
-    "anak_ke": 3,
-    "prestasi": 9
+    "nisn": "65467300",
+    "nama": "Amanda Novia Bella",
+    "c1": 86,
+    "c2": 3500000,
+    "c3": 2,
+    "c4": 1,
+    "c5": "Tidak ada"
   },
   {
-    "nama": "kucing",
-    "nilai": 100,
-    "penghasilan": 3.2,
-    "jumlah_saudara": 3,
-    "anak_ke": 1,
-    "prestasi": 1
+    "nisn": "75780986",
+    "nama": "Ni Luh Sanis Renati",
+    "c1": 86,
+    "c2": 3000000,
+    "c3": 2,
+    "c4": 1,
+    "c5": "Tidak Ada"
+  },
+  {
+    "nisn": "58062698",
+    "nama": "Elizabeth Fermia S.S",
+    "c1": 80,
+    "c2": 4500000,
+    "c3": 3,
+    "c4": 1,
+    "c5": "Tingkat Kelurahan"
+  },
+  {
+    "nisn": "57869654",
+    "nama": "M. Nur Fitrianto",
+    "c1": 80,
+    "c2": 3250000,
+    "c3": 3,
+    "c4": 3,
+    "c5": "Tingkat Kelurahan"
+  },
+  {
+    "nisn": "74758646",
+    "nama": "Andi Sopi Nisrina",
+    "c1": 85,
+    "c2": 3000000,
+    "c3": 2,
+    "c4": 2,
+    "c5": "Tingkat Provinsi"
+  },
+  {
+    "nisn": "79734849",
+    "nama": "Nitha Anggraeni",
+    "c1": 80,
+    "c2": 4000000,
+    "c3": 3,
+    "c4": 2,
+    "c5": "Tidak Ada"
+  },
+  {
+    "nisn": "69669002",
+    "nama": "Naila Syalsyabila",
+    "c1": 87,
+    "c2": 5400000,
+    "c3": 4,
+    "c4": 2,
+    "c5": "Tidak Ada"
+  },
+  {
+    "nisn": "74633519",
+    "nama": "Dinny Meilinda Wiranti",
+    "c1": 81,
+    "c2": 3800000,
+    "c3": 2,
+    "c4": 2,
+    "c5": "Tingkat Provinsi"
   }
 ]

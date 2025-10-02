@@ -1,29 +1,144 @@
 {
   "criteria": [
     {
-      "name": "Nilai Rata-Rata Rapot",
-      "type": "benefit",
-      "weight": 0.35
+      "kode": "C1",
+      "nama": "Nilai Rata-Rata Rapot",
+      "bobot": 0.35,
+      "atribut": "benefit",
+      "skala_penilaian": [
+        {
+          "rentang": "≥ 88",
+          "nilai": 5
+        },
+        {
+          "rentang": "86 - 87",
+          "nilai": 4
+        },
+        {
+          "rentang": "84 - 85",
+          "nilai": 3
+        },
+        {
+          "rentang": "82 - 83",
+          "nilai": 2
+        },
+        {
+          "rentang": "≤ 81",
+          "nilai": 1
+        }
+      ]
     },
     {
-      "name": "Penghasilan Orang Tua",
-      "type": "cost",
-      "weight": 0.30
+      "kode": "C2",
+      "nama": "Penghasilan Orang Tua",
+      "bobot": 0.25,
+      "atribut": "cost",
+      "skala_penilaian": [
+        {
+          "rentang": "≤ 1.500.000",
+          "nilai": 5
+        },
+        {
+          "rentang": "1.500.000 - 3.000.000",
+          "nilai": 4
+        },
+        {
+          "rentang": "3.000.000 - 5.000.000",
+          "nilai": 3
+        },
+        {
+          "rentang": "5.000.000 - 10.000.000",
+          "nilai": 2
+        },
+        {
+          "rentang": "≥ 10.000.000",
+          "nilai": 1
+        }
+      ]
     },
     {
-      "name": "Jumlah Saudara",
-      "type": "benefit",
-      "weight": 0.15
+      "kode": "C3",
+      "nama": "Jumlah Saudara",
+      "bobot": 0.20,
+      "atribut": "benefit",
+      "skala_penilaian": [
+        {
+          "rentang": "≥ 5",
+          "nilai": 5
+        },
+        {
+          "rentang": "4",
+          "nilai": 4
+        },
+        {
+          "rentang": "3",
+          "nilai": 3
+        },
+        {
+          "rentang": "2",
+          "nilai": 2
+        },
+        {
+          "rentang": "≤ 1",
+          "nilai": 1
+        }
+      ]
     },
     {
-      "name": "Anak ke",
-      "type": "cost",
-      "weight": 0.10
+      "kode": "C4",
+      "nama": "Anak Ke",
+      "bobot": 0.10,
+      "atribut": "cost",
+      "skala_penilaian": [
+        {
+          "rentang": "1",
+          "nilai": 5
+        },
+        {
+          "rentang": "2",
+          "nilai": 4
+        },
+        {
+          "rentang": "3",
+          "nilai": 3
+        },
+        {
+          "rentang": "4",
+          "nilai": 2
+        },
+        {
+          "rentang": "≥ 5",
+          "nilai": 1
+        }
+      ]
     },
     {
-      "name": "Prestasi Non Akademik",
-      "type": "benefit",
-      "weight": 0.10
+      "kode": "C5",
+      "nama": "Prestasi Akademik/Nonakademik",
+      "bobot": 0.10,
+      "atribut": "benefit",
+      "skala_penilaian": [
+        {
+          "kategori": "Nasional",
+          "nilai": 5
+        },
+        {
+          "kategori": "Provinsi",
+          "nilai": 4
+        },
+        {
+          "kategori": "Kabupaten",
+          "nilai": 3
+        },
+        {
+          "kategori": "Kelurahan",
+          "nilai": 2
+        },
+        {
+          "kategori": "Tidak ada",
+          "nilai": 1
+        }
+      ]
     }
   ]
 }
