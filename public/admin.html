@@ -77,6 +77,10 @@
                     :class="[activePage === 'results' ? 'bg-indigo-700' : 'hover:bg-indigo-500', 'px-3 py-2 rounded-md text-sm font-medium text-white']">
                     Hasil Seleksi
                   </a>
+                  <a href="#" @click.prevent="activePage = 'calculation'"
+                    :class="[activePage === 'calculation' ? 'bg-indigo-700' : 'hover:bg-indigo-500', 'px-3 py-2 rounded-md text-sm font-medium text-white']">
+                    Perhitungan SAW
+                  </a>
                 </div>
               </div>
             </div>
@@ -586,6 +590,317 @@
             </div>
           </div>
         </div>
+
+        <!-- Calculation Detail -->
+        <div v-if="activePage === 'calculation'">
+          <div class="px-4 py-6 sm:px-0">
+            <div class="mb-4">
+              <h2 class="text-xl font-semibold text-gray-800">Detail Perhitungan SAW</h2>
+              <p class="text-gray-600 mt-1">Langkah-langkah perhitungan metode SAW (Simple Additive Weighting)</p>
+            </div>
+
+            <!-- Step 1: Data Awal -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">1. Data Awal Siswa</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C1 (Nilai Rapot)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C2 (Penghasilan)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C3 (Jumlah Saudara)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C4 (Anak ke)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C5 (Prestasi)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="siswa in calculationData.dataAwal" :key="siswa.nama">
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.nama }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c1 }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ (siswa.c2 / 1000000).toFixed(1) }} juta</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c3 }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c4 }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c5 }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Step 2: Bobot Kriteria & Skala Penilaian -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">2. Bobot Kriteria & Skala Penilaian</h3>
+              <div class="space-y-6">
+                <div v-for="(kriteria, index) in calculationData.bobotKriteria" :key="index" 
+                     class="border border-gray-200 rounded-lg p-4">
+                  <!-- Header Kriteria -->
+                  <div class="flex justify-between items-center mb-4">
+                    <div>
+                      <h4 class="font-semibold text-gray-800">{{ kriteria.nama }}</h4>
+                      <p class="text-sm text-gray-600">{{ kriteria.kode }}</p>
+                    </div>
+                    <div class="text-right">
+                      <div class="flex items-center space-x-4">
+                        <div>
+                          <span class="text-sm text-gray-600">Bobot:</span>
+                          <span class="font-semibold text-indigo-600 ml-1">{{ kriteria.bobot }}</span>
+                        </div>
+                        <div>
+                          <span class="text-sm text-gray-600">Atribut:</span>
+                          <span :class="kriteria.atribut === 'benefit' ? 'text-green-600' : 'text-red-600'" 
+                                class="text-sm font-medium ml-1">
+                            {{ kriteria.atribut }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Skala Penilaian Detail -->
+                  <div v-if="calculationData.skalaPenilaianDetail && calculationData.skalaPenilaianDetail[index]">
+                    <h5 class="font-medium text-gray-700 mb-3">Skala Penilaian:</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div v-for="(skala, skalaIndex) in calculationData.skalaPenilaianDetail[index]" :key="skalaIndex"
+                           class="bg-gray-50 p-3 rounded border">
+                        <div class="flex justify-between items-center">
+                          <div>
+                            <span class="text-sm font-medium text-gray-800">
+                              {{ skala.rentang || skala.kategori }}
+                            </span>
+                          </div>
+                          <span class="text-lg font-bold text-indigo-600">{{ skala.nilai }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Konversi Skala Penilaian -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">3. Konversi ke Skala Penilaian</h3>
+              
+              <!-- Contoh Konversi untuk Setiap Kriteria -->
+              <div class="mb-6 space-y-4">
+                <div v-for="(kriteria, index) in calculationData.bobotKriteria" :key="index"
+                     class="border border-gray-200 rounded-lg p-4">
+                  <h4 class="font-medium text-gray-800 mb-3">{{ kriteria.nama }} ({{ kriteria.kode }})</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h5 class="text-sm font-medium text-gray-600 mb-2">Contoh Konversi:</h5>
+                      <div class="space-y-1 text-sm">
+                        <div v-for="(siswa, siswaIndex) in calculationData.skalaPenilaian.slice(0, 3)" :key="siswaIndex"
+                             class="flex justify-between">
+                          <span>{{ siswa.nama }}: {{ getOriginalValue(siswa, index) }}</span>
+                          <span class="font-medium text-indigo-600">→ {{ getSkalaValue(siswa, index) }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <h5 class="text-sm font-medium text-gray-600 mb-2">Skala Penilaian:</h5>
+                      <div class="space-y-1 text-sm">
+                        <div v-for="(skala, skalaIndex) in calculationData.skalaPenilaianDetail[index]" :key="skalaIndex"
+                             class="flex justify-between">
+                          <span>{{ skala.rentang || skala.kategori }}</span>
+                          <span class="font-medium text-gray-600">= {{ skala.nilai }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tabel Hasil Konversi -->
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C1 (Skala)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C2 (Skala)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C3 (Skala)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C4 (Skala)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C5 (Skala)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="siswa in calculationData.skalaPenilaian" :key="siswa.nama">
+                      <td class="px-4 py-3 text-sm text-gray-900 font-medium">{{ siswa.nama }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c1_skala }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c2_skala }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c3_skala }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c4_skala }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c5_skala }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="mt-4 p-4 bg-yellow-50 rounded-lg">
+                <h4 class="font-medium text-yellow-800 mb-2">Konversi Skala Penilaian:</h4>
+                <div class="text-sm text-yellow-700">
+                  <p>Nilai mentah dikonversi ke nilai skala berdasarkan rentang/kategori yang ditentukan dalam kriteria</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4: Normalisasi Matriks -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">4. Matriks Normalisasi</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C1 (Normalisasi)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C2 (Normalisasi)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C3 (Normalisasi)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C4 (Normalisasi)</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C5 (Normalisasi)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="siswa in calculationData.matriksNormalisasi" :key="siswa.nama">
+                      <td class="px-4 py-3 text-sm text-gray-900 font-medium">{{ siswa.nama }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c1.toFixed(4) }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c2.toFixed(4) }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c3.toFixed(4) }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c4.toFixed(4) }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.c5.toFixed(4) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                <h4 class="font-medium text-blue-800 mb-2">Rumus Normalisasi:</h4>
+                <div class="text-sm text-blue-700">
+                  <p><strong>Benefit:</strong> Xij / Max(Xij)</p>
+                  <p><strong>Cost:</strong> Min(Xij) / Xij</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 5: Perhitungan SAW -->
+            <div class="bg-white shadow rounded-lg p-6 mb-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">5. Perhitungan Nilai SAW</h3>
+              
+              <!-- Detail Perhitungan untuk Setiap Siswa -->
+              <div class="mb-6 space-y-4">
+                <div v-for="(siswa, index) in calculationData.perhitunganSAW.slice(0, 3)" :key="siswa.nama"
+                     class="border border-gray-200 rounded-lg p-4">
+                  <h4 class="font-medium text-gray-800 mb-3">{{ siswa.nama }}</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div v-for="(kriteria, kriteriaIndex) in calculationData.bobotKriteria" :key="kriteriaIndex"
+                         class="bg-gray-50 p-3 rounded border">
+                      <div class="text-sm">
+                        <div class="font-medium text-gray-700 mb-1">{{ kriteria.nama }}</div>
+                        <div class="text-gray-600 mb-1">
+                          Normalisasi: {{ getNormalizedValue(siswa.nama, kriteriaIndex).toFixed(4) }}
+                        </div>
+                        <div class="text-gray-600 mb-1">
+                          Bobot: {{ kriteria.bobot }}
+                        </div>
+                        <div class="font-semibold text-indigo-600">
+                          {{ getNormalizedValue(siswa.nama, kriteriaIndex).toFixed(4) }} × {{ kriteria.bobot }} = {{ getWeightedValue(siswa.nama, kriteriaIndex).toFixed(4) }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-3 p-3 bg-indigo-50 rounded border">
+                    <div class="text-sm font-semibold text-indigo-800">
+                      Total SAW = {{ getTotalSAW(siswa.nama).toFixed(4) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tabel Ringkasan Perhitungan -->
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C1 × W1</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C2 × W2</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C3 × W3</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C4 × W4</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">C5 × W5</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total SAW</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="siswa in calculationData.perhitunganSAW" :key="siswa.nama">
+                      <td class="px-4 py-3 text-sm text-gray-900 font-medium">{{ siswa.nama }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="text-xs text-gray-500">{{ getNormalizedValue(siswa.nama, 0).toFixed(4) }} × {{ calculationData.bobotKriteria[0].bobot }}</div>
+                        <div class="font-medium">{{ siswa.c1_weighted.toFixed(4) }}</div>
+                      </td>
+                      <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="text-xs text-gray-500">{{ getNormalizedValue(siswa.nama, 1).toFixed(4) }} × {{ calculationData.bobotKriteria[1].bobot }}</div>
+                        <div class="font-medium">{{ siswa.c2_weighted.toFixed(4) }}</div>
+                      </td>
+                      <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="text-xs text-gray-500">{{ getNormalizedValue(siswa.nama, 2).toFixed(4) }} × {{ calculationData.bobotKriteria[2].bobot }}</div>
+                        <div class="font-medium">{{ siswa.c3_weighted.toFixed(4) }}</div>
+                      </td>
+                      <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="text-xs text-gray-500">{{ getNormalizedValue(siswa.nama, 3).toFixed(4) }} × {{ calculationData.bobotKriteria[3].bobot }}</div>
+                        <div class="font-medium">{{ siswa.c4_weighted.toFixed(4) }}</div>
+                      </td>
+                      <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="text-xs text-gray-500">{{ getNormalizedValue(siswa.nama, 4).toFixed(4) }} × {{ calculationData.bobotKriteria[4].bobot }}</div>
+                        <div class="font-medium">{{ siswa.c5_weighted.toFixed(4) }}</div>
+                      </td>
+                      <td class="px-4 py-3 text-sm font-semibold text-indigo-600">{{ siswa.nilai_saw.toFixed(4) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="mt-4 p-4 bg-green-50 rounded-lg">
+                <h4 class="font-medium text-green-800 mb-2">Rumus SAW:</h4>
+                <div class="text-sm text-green-700">
+                  <p><strong>SAW = Σ (Xij × Wj)</strong></p>
+                  <p>Dimana: Xij = nilai normalisasi, Wj = bobot kriteria</p>
+                  <p class="mt-2"><strong>Contoh:</strong> SAW = (C1×W1) + (C2×W2) + (C3×W3) + (C4×W4) + (C5×W5)</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 6: Peringkat Final -->
+            <div class="bg-white shadow rounded-lg p-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">6. Peringkat Final</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Peringkat</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nilai SAW</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="(siswa, index) in calculationData.peringkatFinal" :key="siswa.nama"
+                        :class="{'bg-green-50': siswa.lolos}">
+                      <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ index + 1 }}</td>
+                      <td class="px-4 py-3 text-sm text-gray-900">{{ siswa.nama }}</td>
+                      <td class="px-4 py-3 text-sm font-semibold text-indigo-600">{{ siswa.nilai_saw.toFixed(4) }}</td>
+                      <td class="px-4 py-3 text-sm">
+                        <span v-if="siswa.lolos" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Lolos
+                        </span>
+                        <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          Tidak Lolos
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
 
       <!-- Student Modal -->
@@ -785,6 +1100,17 @@
           persentaseLolos: 0,
           jumlahKriteria: 0,
           top5: []
+        });
+
+        // Calculation Data
+        const calculationData = ref({
+          dataAwal: [],
+          bobotKriteria: [],
+          skalaPenilaianDetail: [],
+          skalaPenilaian: [],
+          matriksNormalisasi: [],
+          perhitunganSAW: [],
+          peringkatFinal: []
         });
 
         // Logo Upload State
@@ -1325,6 +1651,233 @@
           alert('Hasil seleksi telah diperbarui');
         };
 
+        // Calculation Detail Functions
+        const calculateDetailSAW = () => {
+          if (!students.value.length || !criteriaData.value.criteria.length) return;
+
+          // 1. Data Awal
+          calculationData.value.dataAwal = students.value.map(siswa => ({
+            nama: siswa.nama,
+            c1: siswa.c1,
+            c2: siswa.c2,
+            c3: siswa.c3,
+            c4: siswa.c4,
+            c5: siswa.c5
+          }));
+
+          // 2. Bobot Kriteria & Skala Penilaian Detail
+          calculationData.value.bobotKriteria = criteriaData.value.criteria.map(kriteria => ({
+            kode: kriteria.kode,
+            nama: kriteria.nama,
+            bobot: kriteria.bobot,
+            atribut: kriteria.atribut
+          }));
+
+          // Simpan detail skala penilaian untuk setiap kriteria
+          calculationData.value.skalaPenilaianDetail = criteriaData.value.criteria.map(kriteria => 
+            kriteria.skala_penilaian || []
+          );
+
+          // 3. Konversi ke Skala Penilaian (sesuai backend)
+          const criteria = criteriaData.value.criteria;
+          const studentsWithSkala = students.value.map(student => {
+            const studentSkala = { ...student };
+            
+            criteria.forEach(criterion => {
+              const criterionField = mapCriteriaToField(criterion.nama);
+              
+              if (criterionField) {
+                // Konversi nilai mentah ke nilai skala menggunakan skala penilaian
+                const nilaiSkala = convertToSkalaNilai(student[criterionField], criterion.skala_penilaian);
+                studentSkala[`${criterionField}_skala`] = nilaiSkala;
+              }
+            });
+            
+            return studentSkala;
+          });
+
+          // Simpan data skala penilaian untuk ditampilkan
+          calculationData.value.skalaPenilaian = studentsWithSkala.map(siswa => ({
+            nama: siswa.nama,
+            c1_skala: siswa.c1_skala,
+            c2_skala: siswa.c2_skala,
+            c3_skala: siswa.c3_skala,
+            c4_skala: siswa.c4_skala,
+            c5_skala: siswa.c5_skala
+          }));
+
+          // 4. Normalisasi Matriks (menggunakan nilai skala)
+          const normalizedData = studentsWithSkala.map(siswa => {
+            const normalized = {};
+            
+            criteria.forEach(criterion => {
+              const criterionField = mapCriteriaToField(criterion.nama);
+              
+              if (criterionField) {
+                const nilaiSkala = siswa[`${criterionField}_skala`];
+                
+                if (criterion.atribut === 'benefit') {
+                  // Untuk benefit, nilai dinormalisasi dengan rumus: nilai / nilai maksimum
+                  const maxValue = Math.max(...studentsWithSkala.map(s => s[`${criterionField}_skala`]));
+                  normalized[criterionField] = nilaiSkala / maxValue;
+                } else { // cost
+                  // Untuk cost, nilai dinormalisasi dengan rumus: nilai minimum / nilai
+                  const minValue = Math.min(...studentsWithSkala.map(s => s[`${criterionField}_skala`]));
+                  normalized[criterionField] = minValue / nilaiSkala;
+                }
+              }
+            });
+            
+            return {
+              nama: siswa.nama,
+              c1: normalized.c1,
+              c2: normalized.c2,
+              c3: normalized.c3,
+              c4: normalized.c4,
+              c5: normalized.c5
+            };
+          });
+          
+          calculationData.value.matriksNormalisasi = normalizedData;
+
+          // 5. Perhitungan SAW
+          const sawData = normalizedData.map(siswa => {
+            let totalNilai = 0;
+            const weightedValues = {};
+            
+            criteria.forEach(criterion => {
+              const criterionField = mapCriteriaToField(criterion.nama);
+              
+              if (criterionField) {
+                const weightedValue = siswa[criterionField] * criterion.bobot;
+                weightedValues[`${criterionField}_weighted`] = weightedValue;
+                totalNilai += weightedValue;
+              }
+            });
+            
+            return {
+              nama: siswa.nama,
+              c1_weighted: weightedValues.c1_weighted || 0,
+              c2_weighted: weightedValues.c2_weighted || 0,
+              c3_weighted: weightedValues.c3_weighted || 0,
+              c4_weighted: weightedValues.c4_weighted || 0,
+              c5_weighted: weightedValues.c5_weighted || 0,
+              nilai_saw: parseFloat(totalNilai.toFixed(4))
+            };
+          });
+          
+          calculationData.value.perhitunganSAW = sawData;
+
+          // 6. Peringkat Final
+          const sortedSAW = sawData.sort((a, b) => b.nilai_saw - a.nilai_saw);
+          const kuota = settingsData.value.kuota_beasiswa || 0;
+          
+          calculationData.value.peringkatFinal = sortedSAW.map((siswa, index) => ({
+            nama: siswa.nama,
+            nilai_saw: siswa.nilai_saw,
+            lolos: index < kuota
+          }));
+        };
+
+        // Helper functions untuk konversi skala (sesuai backend)
+        const mapCriteriaToField = (criteriaName) => {
+          const mapping = {
+            'Nilai Rata-Rata Rapot': 'c1',
+            'Penghasilan Orang Tua': 'c2',
+            'Jumlah Saudara': 'c3',
+            'Anak Ke': 'c4',
+            'Prestasi Akademik/Nonakademik': 'c5'
+          };
+          return mapping[criteriaName] || null;
+        };
+
+        const convertToSkalaNilai = (nilaiMentah, skalaPenilaian) => {
+          if (!skalaPenilaian || skalaPenilaian.length === 0) {
+            return nilaiMentah;
+          }
+
+          // Untuk kriteria yang menggunakan kategori (seperti prestasi)
+          if (typeof nilaiMentah === 'string') {
+            const skala = skalaPenilaian.find(s => 
+              s.kategori && s.kategori.toLowerCase() === nilaiMentah.toLowerCase()
+            );
+            return skala ? skala.nilai : 1;
+          }
+
+          // Untuk kriteria numerik (nilai, penghasilan, dll)
+          const nilai = parseFloat(nilaiMentah);
+          
+          for (const skala of skalaPenilaian) {
+            if (skala.rentang) {
+              if (isInRange(nilai, skala.rentang)) {
+                return skala.nilai;
+              }
+            }
+          }
+          
+          // Jika tidak ada yang cocok, kembalikan nilai terendah
+          return Math.min(...skalaPenilaian.map(s => s.nilai));
+        };
+
+        const isInRange = (nilai, rentang) => {
+          if (rentang.includes('≥')) {
+            const threshold = parseFloat(rentang.replace('≥', '').replace(/[^\d.-]/g, ''));
+            return nilai >= threshold;
+          } else if (rentang.includes('≤')) {
+            const threshold = parseFloat(rentang.replace('≤', '').replace(/[^\d.-]/g, ''));
+            return nilai <= threshold;
+          } else if (rentang.includes(' - ')) {
+            const parts = rentang.split(' - ');
+            const min = parseFloat(parts[0].replace(/[^\d.-]/g, ''));
+            const max = parseFloat(parts[1].replace(/[^\d.-]/g, ''));
+            return nilai >= min && nilai <= max;
+          }
+          return false;
+        };
+
+        const fetchCalculationData = async () => {
+          await fetchStudents();
+          await fetchCriteria();
+          await fetchSettings();
+          calculateDetailSAW();
+        };
+
+        // Helper functions untuk menampilkan nilai asli dan skala
+        const getOriginalValue = (siswa, kriteriaIndex) => {
+          const fieldMap = ['c1', 'c2', 'c3', 'c4', 'c5'];
+          const field = fieldMap[kriteriaIndex];
+          if (field === 'c2') {
+            return (siswa[field] / 1000000).toFixed(1) + ' juta';
+          }
+          return siswa[field];
+        };
+
+        const getSkalaValue = (siswa, kriteriaIndex) => {
+          const fieldMap = ['c1_skala', 'c2_skala', 'c3_skala', 'c4_skala', 'c5_skala'];
+          const field = fieldMap[kriteriaIndex];
+          return siswa[field];
+        };
+
+        // Helper functions untuk perhitungan SAW detail
+        const getNormalizedValue = (namaSiswa, kriteriaIndex) => {
+          const fieldMap = ['c1', 'c2', 'c3', 'c4', 'c5'];
+          const field = fieldMap[kriteriaIndex];
+          const siswa = calculationData.value.matriksNormalisasi.find(s => s.nama === namaSiswa);
+          return siswa ? siswa[field] : 0;
+        };
+
+        const getWeightedValue = (namaSiswa, kriteriaIndex) => {
+          const fieldMap = ['c1_weighted', 'c2_weighted', 'c3_weighted', 'c4_weighted', 'c5_weighted'];
+          const field = fieldMap[kriteriaIndex];
+          const siswa = calculationData.value.perhitunganSAW.find(s => s.nama === namaSiswa);
+          return siswa ? siswa[field] : 0;
+        };
+
+        const getTotalSAW = (namaSiswa) => {
+          const siswa = calculationData.value.perhitunganSAW.find(s => s.nama === namaSiswa);
+          return siswa ? siswa.nilai_saw : 0;
+        };
+
         onMounted(() => {
           // Check if user is already logged in
           const savedAuth = localStorage.getItem('adminAuth');
@@ -1351,6 +1904,9 @@
             setTimeout(() => {
               createCharts();
             }, 500);
+          } else if (newPage === 'calculation') {
+            // Calculate detail SAW when switching to calculation page
+            fetchCalculationData();
           }
         });
 
@@ -1376,6 +1932,7 @@
           hasilSeleksi,
           informasiData,
           dashboardStats,
+          calculationData,
           studentModal,
           criteriaModal,
           editMode,
@@ -1394,6 +1951,12 @@
           saveSettings,
           saveInformasi,
           refreshResults,
+          fetchCalculationData,
+          getOriginalValue,
+          getSkalaValue,
+          getNormalizedValue,
+          getWeightedValue,
+          getTotalSAW,
           sawChart,
           criteriaChart,
           logoUploading,
