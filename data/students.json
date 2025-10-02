@@ -6,7 +6,7 @@
     "c2": 2000000,
     "c3": 5,
     "c4": 4,
-    "c5": "Tingkat Kabupaten"
+    "c5": "Kabupaten"
   },
   {
     "nisn": "73932426",
@@ -15,7 +15,7 @@
     "c2": 2500000,
     "c3": 4,
     "c4": 3,
-    "c5": "Tingkat Kabupaten"
+    "c5": "Kabupaten"
   },
   {
     "nisn": "65467300",
@@ -33,7 +33,7 @@
     "c2": 3000000,
     "c3": 2,
     "c4": 1,
-    "c5": "Tidak Ada"
+    "c5": "Tidak ada"
   },
   {
     "nisn": "58062698",
@@ -42,7 +42,7 @@
     "c2": 4500000,
     "c3": 3,
     "c4": 1,
-    "c5": "Tingkat Kelurahan"
+    "c5": "Kelurahan"
   },
   {
     "nisn": "57869654",
@@ -51,7 +51,7 @@
     "c2": 3250000,
     "c3": 3,
     "c4": 3,
-    "c5": "Tingkat Kelurahan"
+    "c5": "Kelurahan"
   },
   {
     "nisn": "74758646",
@@ -60,7 +60,7 @@
     "c2": 3000000,
     "c3": 2,
     "c4": 2,
-    "c5": "Tingkat Provinsi"
+    "c5": "Provinsi"
   },
   {
     "nisn": "79734849",
@@ -69,7 +69,7 @@
     "c2": 4000000,
     "c3": 3,
     "c4": 2,
-    "c5": "Tidak Ada"
+    "c5": "Tidak ada"
   },
   {
     "nisn": "69669002",
@@ -78,7 +78,7 @@
     "c2": 5400000,
     "c3": 4,
     "c4": 2,
-    "c5": "Tidak Ada"
+    "c5": "Tidak ada"
   },
   {
     "nisn": "74633519",
@@ -87,6 +87,6 @@
     "c2": 3800000,
     "c3": 2,
     "c4": 2,
-    "c5": "Tingkat Provinsi"
+    "c5": "Provinsi"
   }
 ]

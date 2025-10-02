@@ -1,9 +1,9 @@
 {
-  "nama_sekolah": "",
-  "alamat_sekolah": "",
-  "tahun_ajaran": "",
-  "pembuat_skripsi": "",
-  "judul_skripsi": "",
-  "tentang_skripsi": "",
-  "logo_sekolah": "/default-logo.png"
+  "nama_sekolah": "SMA N 2 Kutai Kartanegara",
+  "alamat_sekolah": "Jl. Raya Kutai Kartanegara, Kec. Kutai Kartanegara, Kab. Kutai Kartanegara, Prov. Kutai Kartanegara",
+  "tahun_ajaran": "2024/2025",
+  "pembuat_skripsi": "Dedi Setiawan",
+  "judul_skripsi": "Penerimaan Beasiswa SMAN 2 Kutai Kartanegara Menggunakan Metode Simple Additive Weighting",
+  "tentang_skripsi": "Penerimaan Beasiswa SMAN 2 Kutai Kartanegara Menggunakan Metode Simple Additive Weighting",
+  "logo_sekolah": "/storage/logo.png"
 }

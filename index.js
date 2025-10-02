@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const multer = require("multer");
 
 const app = express();
 const PORT = 3000;
@@ -8,8 +9,37 @@ const PORT = 3000;
 // Middleware untuk parsing JSON
 app.use(express.json());
 
+// Konfigurasi multer untuk upload file
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, 'storage'));
+  },
+  filename: function (req, file, cb) {
+    // Ganti nama file menjadi logo.png
+    cb(null, 'logo.png');
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    // Hanya izinkan file gambar
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Hanya file gambar yang diizinkan!'), false);
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // Batas 5MB
+  }
+});
+
 // Menyajikan file statis dari folder public
 app.use(express.static(path.join(__dirname, "public")));
+
+// Menyajikan file dari folder storage
+app.use('/storage', express.static(path.join(__dirname, 'storage')));
 
 // Endpoint: Login
 app.post("/api/login", (req, res) => {
@@ -68,6 +98,103 @@ app.get("/api/settings", (req, res) => {
   });
 });
 
+// Endpoint: Dapatkan informasi sekolah
+app.get("/api/informasi", (req, res) => {
+  const dataPath = path.join(__dirname, "data", "informasi.json");
+  fs.readFile(dataPath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: "Tidak dapat membaca data informasi sekolah" });
+    }
+    res.json(JSON.parse(data));
+  });
+});
+
+// Endpoint: Memperbarui informasi sekolah
+app.put("/api/informasi", (req, res) => {
+  const updatedInfo = req.body;
+  const dataPath = path.join(__dirname, "data", "informasi.json");
+  
+  fs.writeFile(dataPath, JSON.stringify(updatedInfo, null, 2), (err) => {
+    if (err) {
+      return res.status(500).json({ error: "Tidak dapat menyimpan data informasi sekolah" });
+    }
+    res.json({ message: "Data informasi sekolah berhasil diperbarui", informasi: updatedInfo });
+  });
+});
+
+// Endpoint: Upload logo sekolah
+app.post("/api/upload-logo", upload.single('logo'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "Tidak ada file yang diupload" });
+    }
+
+    // Hapus logo default jika ada
+    const defaultLogoPath = path.join(__dirname, 'storage', 'default-logo.png');
+    if (fs.existsSync(defaultLogoPath)) {
+      fs.unlinkSync(defaultLogoPath);
+    }
+
+    // Update path logo di informasi.json
+    const infoPath = path.join(__dirname, "data", "informasi.json");
+    fs.readFile(infoPath, "utf8", (err, data) => {
+      if (err) {
+        return res.status(500).json({ error: "Tidak dapat membaca data informasi" });
+      }
+      
+      const info = JSON.parse(data);
+      info.logo_sekolah = '/storage/logo.png';
+      
+      fs.writeFile(infoPath, JSON.stringify(info, null, 2), (err) => {
+        if (err) {
+          return res.status(500).json({ error: "Tidak dapat menyimpan path logo" });
+        }
+        res.json({ 
+          message: "Logo berhasil diupload", 
+          logo_path: '/storage/logo.png' 
+        });
+      });
+    });
+
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ error: "Gagal mengupload logo" });
+  }
+});
+
+// Endpoint: Hapus logo
+app.delete("/api/delete-logo", (req, res) => {
+  try {
+    const logoPath = path.join(__dirname, 'storage', 'logo.png');
+    
+    if (fs.existsSync(logoPath)) {
+      fs.unlinkSync(logoPath);
+    }
+
+    // Reset ke default logo
+    const infoPath = path.join(__dirname, "data", "informasi.json");
+    fs.readFile(infoPath, "utf8", (err, data) => {
+      if (err) {
+        return res.status(500).json({ error: "Tidak dapat membaca data informasi" });
+      }
+      
+      const info = JSON.parse(data);
+      info.logo_sekolah = '/default-logo.png';
+      
+      fs.writeFile(infoPath, JSON.stringify(info, null, 2), (err) => {
+        if (err) {
+          return res.status(500).json({ error: "Tidak dapat menyimpan path logo" });
+        }
+        res.json({ message: "Logo berhasil dihapus" });
+      });
+    });
+
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({ error: "Gagal menghapus logo" });
+  }
+});
+
 // Endpoint: Memperbarui pengaturan
 app.put("/api/settings", (req, res) => {
   const updatedSettings = req.body;
@@ -106,47 +233,60 @@ app.get("/api/hasil", (req, res) => {
 
 // Fungsi untuk menghitung metode SAW
 function hitungMetodeSAW(students, criteria, settings) {
-  // Mencari nilai maksimum dan minimum untuk tiap kriteria
+  // Konversi nilai mentah siswa ke nilai skala berdasarkan skala penilaian
+  const studentsWithSkala = students.map(student => {
+    const studentSkala = { ...student };
+    
+    criteria.forEach(criterion => {
+      const criterionField = mapCriteriaToField(criterion.nama);
+      
+      if (criterionField) {
+        // Konversi nilai mentah ke nilai skala menggunakan skala penilaian
+        const nilaiSkala = convertToSkalaNilai(student[criterionField], criterion.skala_penilaian);
+        studentSkala[`${criterionField}_skala`] = nilaiSkala;
+      }
+    });
+    
+    return studentSkala;
+  });
+  
+  // Mencari nilai maksimum dan minimum untuk tiap kriteria (dari nilai skala)
   const maxMin = {};
   
   criteria.forEach(criterion => {
-    const criterionField = mapCriteriaToField(criterion.name);
+    const criterionField = mapCriteriaToField(criterion.nama);
     
     if (criterionField) {
-      if (criterion.type === 'benefit') {
-        maxMin[criterionField] = {
-          max: Math.max(...students.map(s => s[criterionField])),
-          min: Math.min(...students.map(s => s[criterionField]))
-        };
-      } else { // cost
-        maxMin[criterionField] = {
-          max: Math.max(...students.map(s => s[criterionField])),
-          min: Math.min(...students.map(s => s[criterionField]))
-        };
-      }
+      const values = studentsWithSkala.map(s => s[`${criterionField}_skala`]);
+      
+      maxMin[criterionField] = {
+        max: Math.max(...values),
+        min: Math.min(...values)
+      };
     }
   });
   
   // Normalisasi dan kalkulasi nilai SAW untuk setiap siswa
-  const hasilSAW = students.map(student => {
+  const hasilSAW = studentsWithSkala.map(student => {
     let totalNilai = 0;
     
     criteria.forEach(criterion => {
-      const criterionField = mapCriteriaToField(criterion.name);
+      const criterionField = mapCriteriaToField(criterion.nama);
       
       if (criterionField) {
         let normalisasi;
+        const nilaiSkala = student[`${criterionField}_skala`];
         
-        if (criterion.type === 'benefit') {
+        if (criterion.atribut === 'benefit') {
           // Untuk benefit, nilai dinormalisasi dengan rumus: nilai / nilai maksimum
-          normalisasi = student[criterionField] / maxMin[criterionField].max;
+          normalisasi = nilaiSkala / maxMin[criterionField].max;
         } else { // cost
           // Untuk cost, nilai dinormalisasi dengan rumus: nilai minimum / nilai
-          normalisasi = maxMin[criterionField].min / student[criterionField];
+          normalisasi = maxMin[criterionField].min / nilaiSkala;
         }
         
         // Tambahkan nilai normalisasi dikalikan dengan bobot kriteria
-        totalNilai += normalisasi * criterion.weight;
+        totalNilai += normalisasi * criterion.bobot;
       }
     });
     
@@ -177,14 +317,75 @@ function hitungMetodeSAW(students, criteria, settings) {
 // Fungsi untuk memetakan nama kriteria ke field di data siswa
 function mapCriteriaToField(criteriaName) {
   const mapping = {
-    'Nilai Rata-Rata Rapot': 'nilai',
-    'Penghasilan Orang Tua': 'penghasilan',
-    'Jumlah Saudara': 'jumlah_saudara',
-    'Anak ke': 'anak_ke',
-    'Prestasi Non Akademik': 'prestasi'
+    'Nilai Rata-Rata Rapot': 'c1',
+    'Penghasilan Orang Tua': 'c2',
+    'Jumlah Saudara': 'c3',
+    'Anak Ke': 'c4',
+    'Prestasi Akademik/Nonakademik': 'c5'
   };
   
   return mapping[criteriaName] || null;
+}
+
+// Fungsi untuk menilai prestasi berdasarkan kategori
+function getNilaiPrestasi(prestasi) {
+  const mapping = {
+    'Nasional': 5,
+    'Provinsi': 4,
+    'Kabupaten': 3,
+    'Kelurahan': 2,
+    'Tidak ada': 1,
+    'Tidak Ada': 1
+  };
+  
+  return mapping[prestasi] || 1;
+}
+
+// Fungsi untuk mengkonversi nilai mentah ke nilai skala berdasarkan skala penilaian
+function convertToSkalaNilai(nilaiMentah, skalaPenilaian) {
+  if (!skalaPenilaian || skalaPenilaian.length === 0) {
+    return nilaiMentah; // Jika tidak ada skala penilaian, kembalikan nilai asli
+  }
+
+  // Untuk kriteria yang menggunakan kategori (seperti prestasi)
+  if (typeof nilaiMentah === 'string') {
+    const skala = skalaPenilaian.find(s => 
+      s.kategori && s.kategori.toLowerCase() === nilaiMentah.toLowerCase()
+    );
+    return skala ? skala.nilai : 1;
+  }
+
+  // Untuk kriteria numerik (nilai, penghasilan, dll)
+  const nilai = parseFloat(nilaiMentah);
+  
+  for (const skala of skalaPenilaian) {
+    if (skala.rentang) {
+      if (isInRange(nilai, skala.rentang)) {
+        return skala.nilai;
+      }
+    }
+  }
+  
+  // Jika tidak ada yang cocok, kembalikan nilai terendah
+  return Math.min(...skalaPenilaian.map(s => s.nilai));
+}
+
+// Fungsi untuk mengecek apakah nilai berada dalam rentang
+function isInRange(nilai, rentang) {
+  if (rentang.includes('≥')) {
+    const threshold = parseFloat(rentang.replace('≥', '').replace(/[^\d.-]/g, ''));
+    return nilai >= threshold;
+  } else if (rentang.includes('≤')) {
+    const threshold = parseFloat(rentang.replace('≤', '').replace(/[^\d.-]/g, ''));
+    return nilai <= threshold;
+  } else if (rentang.includes(' - ')) {
+    const parts = rentang.split(' - ');
+    const min = parseFloat(parts[0].replace(/[^\d.-]/g, ''));
+    const max = parseFloat(parts[1].replace(/[^\d.-]/g, ''));
+    return nilai >= min && nilai <= max;
+  }
+  
+  return false;
 }
 
 // Endpoint: Menambahkan data siswa baru
