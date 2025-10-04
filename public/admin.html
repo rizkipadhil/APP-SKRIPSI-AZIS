@@ -104,6 +104,36 @@
               <p class="text-gray-600 mt-1">Ringkasan data dan statistik aplikasi beasiswa</p>
             </div>
 
+            <!-- Informasi Kriteria Cepat -->
+            <div class="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-4 mb-8">
+              <h3 class="text-lg font-semibold text-indigo-800 mb-3">📊 Kriteria Seleksi Beasiswa</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                <div class="flex items-center">
+                  <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  <span class="text-gray-700">Nilai Rapot (Benefit)</span>
+                </div>
+                <div class="flex items-center">
+                  <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                  <span class="text-gray-700">Penghasilan (Cost)</span>
+                </div>
+                <div class="flex items-center">
+                  <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  <span class="text-gray-700">Jumlah Saudara (Benefit)</span>
+                </div>
+                <div class="flex items-center">
+                  <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                  <span class="text-gray-700">Anak Ke (Cost)</span>
+                </div>
+                <div class="flex items-center">
+                  <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  <span class="text-gray-700">Prestasi (Benefit)</span>
+                </div>
+                <div class="text-xs text-gray-500 col-span-full mt-2">
+                  🔺 Benefit: Semakin tinggi semakin baik | 🔻 Cost: Semakin rendah semakin baik
+                </div>
+              </div>
+            </div>
+
             <!-- Statistik Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <div class="bg-white overflow-hidden shadow rounded-lg">
@@ -312,6 +342,25 @@
               </button>
             </div>
 
+            <!-- Informasi Atribut Cost/Benefit -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <h3 class="text-lg font-semibold text-blue-800 mb-3">Penjelasan Atribut Kriteria</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-green-100 p-4 rounded-lg">
+                  <h4 class="font-semibold text-green-800 mb-2">🔺 Benefit (Maksimalkan)</h4>
+                  <p class="text-sm text-green-700 mb-2">Kriteria yang semakin tinggi nilainya semakin baik</p>
+                  <p class="text-xs text-green-600">Contoh: Nilai Rapot, Jumlah Saudara</p>
+                  <p class="text-xs text-green-600 font-medium mt-2">Rumus Normalisasi: Xij / Max(Xij)</p>
+                </div>
+                <div class="bg-red-100 p-4 rounded-lg">
+                  <h4 class="font-semibold text-red-800 mb-2">🔻 Cost (Minimalkan)</h4>
+                  <p class="text-sm text-red-700 mb-2">Kriteria yang semakin rendah nilainya semakin baik</p>
+                  <p class="text-xs text-red-600">Contoh: Penghasilan, Anak Ke</p>
+                  <p class="text-xs text-red-600 font-medium mt-2">Rumus Normalisasi: Min(Xij) / Xij</p>
+                </div>
+              </div>
+            </div>
+
             <!-- Criteria Table -->
             <div class="bg-white shadow overflow-hidden sm:rounded-lg">
               <table class="min-w-full divide-y divide-gray-200">
@@ -347,9 +396,22 @@
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <span :class="criterion.atribut === 'benefit' ? 'text-green-600' : 'text-red-600'">
-                        {{ criterion.atribut }}
-                      </span>
+                      <div class="flex items-center">
+                        <span :class="criterion.atribut === 'benefit' ? 'text-green-600' : 'text-red-600'"
+                              class="font-medium">
+                          {{ criterion.atribut }}
+                        </span>
+                        <div class="ml-2 relative group">
+                          <svg class="w-4 h-4 text-gray-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                          </svg>
+                          <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">
+                            {{ criterion.atribut === 'benefit' ? 
+                                'Semakin tinggi nilai semakin baik (Xij/Max)' : 
+                                'Semakin rendah nilai semakin baik (Min/Xij)' }}
+                          </div>
+                        </div>
+                      </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ criterion.bobot }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -774,9 +836,17 @@
               </div>
               <div class="mt-4 p-4 bg-blue-50 rounded-lg">
                 <h4 class="font-medium text-blue-800 mb-2">Rumus Normalisasi:</h4>
-                <div class="text-sm text-blue-700">
-                  <p><strong>Benefit:</strong> Xij / Max(Xij)</p>
-                  <p><strong>Cost:</strong> Min(Xij) / Xij</p>
+                <div class="text-sm text-blue-700 space-y-2">
+                  <div class="bg-green-100 p-3 rounded">
+                    <p><strong>🔺 Benefit (Maksimalkan):</strong> Xij / Max(Xij)</p>
+                    <p class="text-xs text-green-600">Semakin tinggi nilai asli, semakin tinggi nilai normalisasi</p>
+                    <p class="text-xs text-green-600">Contoh: Nilai 88/100 → 88/88 = 1.0</p>
+                  </div>
+                  <div class="bg-red-100 p-3 rounded">
+                    <p><strong>🔻 Cost (Minimalkan):</strong> Min(Xij) / Xij</p>
+                    <p class="text-xs text-red-600">Semakin rendah nilai asli, semakin tinggi nilai normalisasi</p>
+                    <p class="text-xs text-red-600">Contoh: Penghasilan 1.5M (min) → 1.5/1.5 = 1.0</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -859,10 +929,21 @@
               </div>
               <div class="mt-4 p-4 bg-green-50 rounded-lg">
                 <h4 class="font-medium text-green-800 mb-2">Rumus SAW:</h4>
-                <div class="text-sm text-green-700">
+                <div class="text-sm text-green-700 space-y-2">
                   <p><strong>SAW = Σ (Xij × Wj)</strong></p>
                   <p>Dimana: Xij = nilai normalisasi, Wj = bobot kriteria</p>
                   <p class="mt-2"><strong>Contoh:</strong> SAW = (C1×W1) + (C2×W2) + (C3×W3) + (C4×W4) + (C5×W5)</p>
+                  
+                  <div class="mt-3 pt-3 border-t border-green-200">
+                    <h5 class="font-medium text-green-800 mb-2">Penjelasan Bobot Kriteria:</h5>
+                    <div class="text-xs space-y-1">
+                      <p><strong>C1 (Nilai Rapot):</strong> Benefit - Semakin tinggi nilai semakin baik</p>
+                      <p><strong>C2 (Penghasilan):</strong> Cost - Semakin rendah penghasilan semakin layak</p>
+                      <p><strong>C3 (Jumlah Saudara):</strong> Benefit - Semakin banyak saudara semakin layak</p>
+                      <p><strong>C4 (Anak Ke):</strong> Cost - Anak pertama mendapat prioritas</p>
+                      <p><strong>C5 (Prestasi):</strong> Benefit - Semakin tinggi prestasi semakin baik</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -988,9 +1069,17 @@
                 <label for="criteriaType" class="block text-sm font-medium text-gray-700">Atribut</label>
                 <select id="criteriaType" v-model="currentCriterion.atribut" required
                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-2 px-3 border">
-                  <option value="benefit">Benefit</option>
-                  <option value="cost">Cost</option>
+                  <option value="benefit">Benefit (Maksimalkan)</option>
+                  <option value="cost">Cost (Minimalkan)</option>
                 </select>
+                <div class="mt-2 text-xs text-gray-500">
+                  <div v-if="currentCriterion.atribut === 'benefit'" class="text-green-600">
+                    🔺 Semakin tinggi nilai semakin baik (contoh: nilai rapot)
+                  </div>
+                  <div v-else class="text-red-600">
+                    🔻 Semakin rendah nilai semakin baik (contoh: penghasilan)
+                  </div>
+                </div>
               </div>
               <div>
                 <label for="criteriaWeight" class="block text-sm font-medium text-gray-700">Bobot</label>
@@ -1831,6 +1920,12 @@
             const min = parseFloat(parts[0].replace(/[^\d.-]/g, ''));
             const max = parseFloat(parts[1].replace(/[^\d.-]/g, ''));
             return nilai >= min && nilai <= max;
+          } else {
+            // Untuk rentang angka tunggal (seperti "2", "3", "4")
+            const singleValue = parseFloat(rentang.replace(/[^\d.-]/g, ''));
+            if (!isNaN(singleValue)) {
+              return nilai === singleValue;
+            }
           }
           return false;
         };

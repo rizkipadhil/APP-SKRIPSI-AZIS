@@ -31,27 +31,27 @@
     {
       "kode": "C2",
       "nama": "Penghasilan Orang Tua",
-      "bobot": 0.25,
       "atribut": "cost",
+      "bobot": 0.25,
       "skala_penilaian": [
         {
-          "rentang": "≤ 1.500.000",
+          "rentang": "≤ 1500000",
           "nilai": 5
         },
         {
-          "rentang": "1.500.000 - 3.000.000",
+          "rentang": "1500000 - 3000000",
           "nilai": 4
         },
         {
-          "rentang": "3.000.000 - 5.000.000",
+          "rentang": "3000000 - 5000000",
           "nilai": 3
         },
         {
-          "rentang": "5.000.000 - 10.000.000",
+          "rentang": "5000000 - 10000000",
           "nilai": 2
         },
         {
-          "rentang": "≥ 10.000.000",
+          "rentang": "≥ 10000000",
           "nilai": 1
         }
       ]
@@ -59,36 +59,36 @@
     {
       "kode": "C3",
       "nama": "Jumlah Saudara",
-      "bobot": 0.20,
       "atribut": "benefit",
+      "bobot": 0.2,
       "skala_penilaian": [
         {
-          "rentang": "≥ 5",
-          "nilai": 5
-        },
-        {
-          "rentang": "4",
-          "nilai": 4
-        },
-        {
-          "rentang": "3",
-          "nilai": 3
+          "rentang": "≤ 1",
+          "nilai": 1
         },
         {
           "rentang": "2",
           "nilai": 2
         },
         {
-          "rentang": "≤ 1",
-          "nilai": 1
+          "rentang": "3",
+          "nilai": 3
+        },
+        {
+          "rentang": "4",
+          "nilai": 4
+        },
+        {
+          "rentang": "≥ 5",
+          "nilai": 5
         }
       ]
     },
     {
       "kode": "C4",
       "nama": "Anak Ke",
-      "bobot": 0.10,
       "atribut": "cost",
+      "bobot": 0.1,
       "skala_penilaian": [
         {
           "rentang": "1",
@@ -115,7 +115,7 @@
     {
       "kode": "C5",
       "nama": "Prestasi Akademik/Nonakademik",
-      "bobot": 0.10,
+      "bobot": 0.1,
       "atribut": "benefit",
       "skala_penilaian": [
         {

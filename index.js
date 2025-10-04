@@ -383,6 +383,12 @@ function isInRange(nilai, rentang) {
     const min = parseFloat(parts[0].replace(/[^\d.-]/g, ''));
     const max = parseFloat(parts[1].replace(/[^\d.-]/g, ''));
     return nilai >= min && nilai <= max;
+  } else {
+    // Untuk rentang angka tunggal (seperti "2", "3", "4")
+    const singleValue = parseFloat(rentang.replace(/[^\d.-]/g, ''));
+    if (!isNaN(singleValue)) {
+      return nilai === singleValue;
+    }
   }
   
   return false;
